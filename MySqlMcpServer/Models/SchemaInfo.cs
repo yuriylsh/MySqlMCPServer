@@ -2,48 +2,47 @@ namespace MySqlMcpServer.Models;
 
 public record SchemaInfo(
     string Name,
-    bool IsSystem,
-    int? TableCount = null,
-    int? ViewCount = null
+    int IsSystem,
+    long TableCount,
+    long ViewCount
 );
 
 public record TableInfo(
-    string Schema,
+    string Name,
+    string Type
+);
+
+public record TableInfoExtended(
     string Name,
     string Type,
     List<ColumnInfo> Columns,
     List<IndexInfo> Indexes,
-    List<ForeignKeyInfo> ForeignKeys
-);
+    List<ForeignKeyInfo> ForeignKeys);
 
 public record ColumnInfo(
     string Name,
     string DataType,
-    bool IsNullable,
-    bool IsPrimaryKey = false,
-    bool IsAutoIncrement = false,
-    bool HasIndex = false,
-    bool IsUnique = false,
-    string? DefaultValue = null
+    string IsNullable,
+    string ColumnKey,
+    string Extra,
+    string DefaultValue,
+    int IsPrimaryKey,
+    int IsAutoIncrement,
+    int HasIndex,
+    int IsUnique
 );
 
 public record IndexInfo(
     string Name,
     string Type,
-    List<string> Columns,
-    bool IsUnique
+    string ColumnName,
+    int IsUnique
 );
 
 public record ForeignKeyInfo(
     string Name,
-    List<string> LocalColumns,
+    string LocalColumn,
     string ReferencedSchema,
     string ReferencedTable,
-    List<string> ReferencedColumns
-);
-
-public record ViewInfo(
-    string Schema,
-    string Name,
-    string? Definition = null
+    string ReferencedColumn
 );

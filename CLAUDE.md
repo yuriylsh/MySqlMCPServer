@@ -15,13 +15,8 @@ This is a MySQL MCP (Model Context Protocol) Server built with C#/.NET that intr
 ## Key MCP Tools to Implement
 The server exposes these introspection tools:
 - `list_schemas` - Lists all accessible database schemas
-- `describe_schema` - Returns detailed schema information
 - `list_tables` - Returns table names and metadata for a schema
 - `describe_table` - Comprehensive table info (columns, PKs, indexes, FKs)
-- `list_columns` - Column information with data types and constraints
-- `list_indexes` - Index information including type and uniqueness
-- `list_foreign_keys` - Foreign key relationships
-- `list_views` - View definitions and metadata
 
 ## Development Commands
 
@@ -35,15 +30,6 @@ dotnet run --project MySqlMcpServer
 
 # Run the sample client
 dotnet run --project MySqlMcpClient
-```
-
-### Testing
-```bash
-# Run all tests
-dotnet test
-
-# Run tests with coverage
-dotnet test --collect:"XPlat Code Coverage"
 ```
 
 ### Package Management
@@ -87,9 +73,6 @@ MySqlMcpServer/           # Main MCP server console application
 MySqlMcpClient/           # Sample client console application
 ├── Program.cs            # Client demonstration workflows
 └── Examples/             # Common usage scenarios
-
-Tests/                    # Unit and integration tests
-└── MySqlMcpServer.Tests/ # Server component tests
 ```
 
 ## Sample Response Formats

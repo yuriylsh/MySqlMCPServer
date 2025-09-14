@@ -31,45 +31,19 @@ Build a lightweight Model Context Protocol (MCP) server in C#/.NET that introspe
 - Lists all accessible database schemas
 - Returns schema names and basic metadata
 
-**Tool: `describe_schema`** 
-- Parameter: `schema_name` (string, required)
-- Returns detailed schema information including table count, view count
-
 **Tool: `list_tables`**
-- Parameter: `schema_name` (string, optional - defaults to current database)
+- Parameter: `schema_name` (string, required)
 - Returns table names, types (BASE TABLE/VIEW), and basic metadata
 
 **Tool: `describe_table`**
 - Parameters: 
-  - `schema_name` (string, optional)
+  - `schema_name` (string, required)
   - `table_name` (string, required)
 - Returns comprehensive table information:
   - Column definitions (name, data type, nullable, default values)
   - Primary key information
   - Indexes (name, type, columns, uniqueness)
   - Foreign key constraints (local columns, referenced table/columns)
-
-**Tool: `list_columns`**
-- Parameters:
-  - `schema_name` (string, optional)
-  - `table_name` (string, required)
-- Returns column information with data types, constraints, and properties
-
-**Tool: `list_indexes`**
-- Parameters:
-  - `schema_name` (string, optional)
-  - `table_name` (string, required)
-- Returns index information including type, columns, and uniqueness constraints
-
-**Tool: `list_foreign_keys`**
-- Parameters:
-  - `schema_name` (string, optional)
-  - `table_name` (string, optional - if not provided, returns all FKs in schema)
-- Returns foreign key relationships with referenced tables and columns
-
-**Tool: `list_views`**
-- Parameter: `schema_name` (string, optional)
-- Returns view definitions and metadata
 
 #### 3. MCP Protocol Compliance
 - Implement MCP JSON-RPC protocol over stdio transport
@@ -176,8 +150,6 @@ Build a lightweight Model Context Protocol (MCP) server in C#/.NET that introspe
 ```json
 {
   "connectionString": "Server=localhost;Database=testdb;Uid=user;Pwd=password;",
-  "serverName": "mysql-ddl-server",
-  "version": "1.0.0"
 }
 ```
 
@@ -198,11 +170,11 @@ Build a lightweight Model Context Protocol (MCP) server in C#/.NET that introspe
   "schemas": [
     {
       "name": "information_schema",
-      "isSystem": true
+      "isSystem": 1
     },
     {
       "name": "testdb",
-      "isSystem": false,
+      "isSystem": 0,
       "tableCount": 5,
       "viewCount": 2
     }
@@ -220,16 +192,16 @@ Build a lightweight Model Context Protocol (MCP) server in C#/.NET that introspe
     {
       "name": "id",
       "dataType": "int",
-      "isNullable": false,
-      "isPrimaryKey": true,
-      "isAutoIncrement": true
+      "isNullable": 0,
+      "isPrimaryKey": 1,
+      "isAutoIncrement": 1
     },
     {
       "name": "email",
       "dataType": "varchar(255)",
-      "isNullable": false,
-      "hasIndex": true,
-      "isUnique": true
+      "isNullable": 1,
+      "hasIndex": 1,
+      "isUnique": 1
     }
   ],
   "indexes": [
@@ -237,13 +209,13 @@ Build a lightweight Model Context Protocol (MCP) server in C#/.NET that introspe
       "name": "PRIMARY",
       "type": "PRIMARY",
       "columns": ["id"],
-      "isUnique": true
+      "isUnique": 0
     },
     {
       "name": "idx_email",
       "type": "UNIQUE",
       "columns": ["email"],
-      "isUnique": true
+      "isUnique": 1
     }
   ],
   "foreignKeys": []
