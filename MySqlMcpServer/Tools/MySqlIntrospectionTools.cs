@@ -31,7 +31,7 @@ public class MySqlIntrospectionTools
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error listing schemas");
-            throw;
+            return JsonSerializer.Serialize(new ErrorResponse($"Error listing schemas: {ex.Message}"), ErrorResponseSerializerContext.Default.ErrorResponse);
         }
     }
     
@@ -50,7 +50,7 @@ public class MySqlIntrospectionTools
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error listing tables for schema {SchemaName}", schema_name);
-            throw;
+            return JsonSerializer.Serialize(new ErrorResponse($"Error listing tables for schema '{schema_name}': {ex.Message}"), ErrorResponseSerializerContext.Default.ErrorResponse);
         }
     }
 
@@ -67,14 +67,14 @@ public class MySqlIntrospectionTools
             var table = await _introspectionService.DescribeTableAsync(table_name, schema_name);
             if (table == null)
             {
-                return new { error = $"Table `{table_name}` not found in schema `{schema_name}`" };
+                return JsonSerializer.Serialize(new ErrorResponse($"Table `{table_name}` not found in schema `{schema_name}`"), ErrorResponseSerializerContext.Default.ErrorResponse);
             }
             return table;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error describing table {TableName} in schema {SchemaName}", table_name, schema_name);
-            throw;
+            return JsonSerializer.Serialize(new ErrorResponse($"Error describing table '{table_name}' in schema '{schema_name}': {ex.Message}"), ErrorResponseSerializerContext.Default.ErrorResponse);
         }
     }
 }
