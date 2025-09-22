@@ -1,18 +1,26 @@
-using System.Text.Json;
+using Microsoft.Extensions.Configuration;
+using ModelContextProtocol.Client;
 
-Console.WriteLine("MySQL MCP Client - Sample Usage");
-Console.WriteLine("================================");
-Console.WriteLine("This is a placeholder client implementation.");
-Console.WriteLine("To create a proper client, you would need to:");
-Console.WriteLine("1. Start the MySQL MCP Server");
-Console.WriteLine("2. Connect to it via stdio transport");
-Console.WriteLine("3. Send JSON-RPC messages for tool calls");
-Console.WriteLine();
-Console.WriteLine("Example usage with the server:");
-Console.WriteLine("1. Run: dotnet run --project MySqlMcpServer");
-Console.WriteLine("2. Send JSON-RPC messages like:");
-Console.WriteLine(@"{""jsonrpc"": ""2.0"", ""id"": 1, ""method"": ""tools/call"", ""params"": {""name"": ""list_schemas""}}");
-Console.WriteLine();
-Console.WriteLine("For now, you can test the server directly by running it.");
+var configuration = new ConfigurationBuilder()
+    .SetBasePath(AppContext.BaseDirectory)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+    .Build();
 
-await Task.Delay(1000); // Simulate some async work
+var transportOptions = configuration.GetSection(nameof(StdioClientTransportOptions)).Get<StdioClientTransportOptions>();
+var hasReferencedServerDll = transportOptions is { Arguments.Count: > 0 } && File.Exists(transportOptions.Arguments[0]);
+if (!hasReferencedServerDll)
+{
+    Console.WriteLine($"The MCP server DLL configuration is incorrect: the file \"{transportOptions?.Arguments?[0]}\" does not exist.");
+    return;
+}
+
+var clientTransport = new StdioClientTransport(transportOptions!);
+var client = await McpClientFactory.CreateAsync(clientTransport);
+
+// Print the list of tools available from the server.
+var tools = await client.ListToolsAsync();
+foreach (var tool in tools)
+{
+    Console.WriteLine($"{tool.Name} ({tool.Description})");
+}
+
