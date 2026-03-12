@@ -2,8 +2,8 @@ using System.ComponentModel;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;
-using MySqlMcpServer.Models;
-using MySqlMcpServer.Services;
+using MySqlIntrospect.Core.Models;
+using MySqlIntrospect.Core.Services;
 
 namespace MySqlMcpServer.Tools;
 

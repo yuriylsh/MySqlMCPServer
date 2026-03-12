@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
-using MySqlMcpServer.Services;
+using MySqlIntrospect.Core.Services;
 
 var builder = Host.CreateApplicationBuilder(args);
 

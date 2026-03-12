@@ -2,15 +2,16 @@ using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MySqlConnector;
-using MySqlMcpServer.Models;
+using MySqlIntrospect.Core.Models;
 
-namespace MySqlMcpServer.Services;
+namespace MySqlIntrospect.Core.Services;
 
 public interface IMySqlIntrospectionService
 {
-    Task<IEnumerable<SchemaInfo>> ListSchemasAsync();   
+    Task<IEnumerable<SchemaInfo>> ListSchemasAsync();
     Task<IEnumerable<TableInfo>> ListTablesAsync(string schemaName);
     Task<TableInfoExtended?> DescribeTableAsync(string tableName, string schemaName);
+    Task<IEnumerable<TableReferenceInfo>> FindReferencesAsync(string tableName, string schemaName);
 }
 
 public class MySqlIntrospectionService(IConfiguration configuration, ILogger<MySqlIntrospectionService> logger) : IMySqlIntrospectionService
@@ -19,9 +20,9 @@ public class MySqlIntrospectionService(IConfiguration configuration, ILogger<MyS
     private readonly IConfiguration _configuration = configuration;
 
     private MySqlConnection GetConnection()
-    {        
+    {
         try {
-            var connectionString = _configuration.GetValue<string?>("MCP_MySQL_ConnectionString");
+            var connectionString = _configuration["MCP_MySQL_ConnectionString"];
             if (string.IsNullOrWhiteSpace(connectionString)) throw new Exception();
             return new MySqlConnection(connectionString);
         }
@@ -138,5 +139,23 @@ public class MySqlIntrospectionService(IConfiguration configuration, ILogger<MyS
             indexes.AsList(),
             foreignKeys.AsList()
         );
+    }
+
+    public async Task<IEnumerable<TableReferenceInfo>> FindReferencesAsync(string tableName, string schemaName)
+    {
+        await using var connection = GetConnection();
+        var references = await connection.QueryAsync<TableReferenceInfo>("""
+            SELECT
+                kcu.TABLE_SCHEMA as ReferencingSchema,
+                kcu.TABLE_NAME as ReferencingTable,
+                kcu.COLUMN_NAME as ReferencingColumn,
+                kcu.CONSTRAINT_NAME as ConstraintName,
+                kcu.REFERENCED_COLUMN_NAME as ReferencedColumn
+            FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu
+            WHERE kcu.REFERENCED_TABLE_SCHEMA = @schemaName
+              AND kcu.REFERENCED_TABLE_NAME = @tableName
+            ORDER BY kcu.TABLE_NAME, kcu.CONSTRAINT_NAME, kcu.ORDINAL_POSITION
+            """, new { schemaName, tableName });
+        return references.AsList();
     }
 }

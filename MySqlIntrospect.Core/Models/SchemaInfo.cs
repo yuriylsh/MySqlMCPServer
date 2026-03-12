@@ -1,4 +1,4 @@
-namespace MySqlMcpServer.Models;
+namespace MySqlIntrospect.Core.Models;
 
 public record SchemaInfo(
     string Name,
@@ -44,5 +44,13 @@ public record ForeignKeyInfo(
     string LocalColumn,
     string ReferencedSchema,
     string ReferencedTable,
+    string ReferencedColumn
+);
+
+public record TableReferenceInfo(
+    string ReferencingSchema,
+    string ReferencingTable,
+    string ReferencingColumn,
+    string ConstraintName,
     string ReferencedColumn
 );
