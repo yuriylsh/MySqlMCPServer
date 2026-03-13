@@ -19,14 +19,17 @@ public class MySqlIntrospectionService(IConfiguration configuration, ILogger<MyS
     private readonly ILogger<MySqlIntrospectionService> _logger = logger;
     private readonly IConfiguration _configuration = configuration;
 
-    private MySqlConnection GetConnection()
+    private async Task<MySqlConnection> GetConnectionAsync()
     {
         try {
             var connectionString = _configuration["MCP_MySQL_ConnectionString"];
             if (string.IsNullOrWhiteSpace(connectionString)) throw new Exception();
-            return new MySqlConnection(connectionString);
+            var connection = new MySqlConnection(connectionString);
+            await connection.OpenAsync();
+            await connection.ExecuteAsync("SET SESSION TRANSACTION READ ONLY");
+            return connection;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not InvalidOperationException)
         {
             _logger.LogError(ex, "Failed to create MySQL connection with the provided connection string.");
             throw new InvalidOperationException("MySQL connection string not configured. Set it as `MCP_MySQL_ConnectionString` environment variable or appsettings.json value.");
@@ -35,7 +38,7 @@ public class MySqlIntrospectionService(IConfiguration configuration, ILogger<MyS
 
     public async Task<IEnumerable<SchemaInfo>> ListSchemasAsync()
     {
-        await using var connection = GetConnection();
+        await using var connection = await GetConnectionAsync();
 
         var schemas = await connection.QueryAsync<SchemaInfo>("""
                   SELECT
@@ -58,7 +61,7 @@ public class MySqlIntrospectionService(IConfiguration configuration, ILogger<MyS
 
     public async Task<IEnumerable<TableInfo>> ListTablesAsync(string schemaName)
     {
-        await using var connection = GetConnection();
+        await using var connection = await GetConnectionAsync();
         var tables = await connection.QueryAsync<TableInfo>("""
                 SELECT
                     TABLE_NAME as Name,
@@ -73,7 +76,7 @@ public class MySqlIntrospectionService(IConfiguration configuration, ILogger<MyS
 
     public async Task<TableInfoExtended?> DescribeTableAsync(string tableName, string schemaName)
     {
-        await using var connection = GetConnection();
+        await using var connection = await GetConnectionAsync();
 
         const string sql = """
 		-- Query 1: Table information
@@ -143,7 +146,7 @@ public class MySqlIntrospectionService(IConfiguration configuration, ILogger<MyS
 
     public async Task<IEnumerable<TableReferenceInfo>> FindReferencesAsync(string tableName, string schemaName)
     {
-        await using var connection = GetConnection();
+        await using var connection = await GetConnectionAsync();
         var references = await connection.QueryAsync<TableReferenceInfo>("""
             SELECT
                 kcu.TABLE_SCHEMA as ReferencingSchema,
