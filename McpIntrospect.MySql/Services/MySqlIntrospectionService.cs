@@ -2,20 +2,12 @@ using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MySqlConnector;
-using MySqlIntrospect.Core.Models;
+using McpIntrospect.Core.Models;
+using McpIntrospect.Core.Services;
 
-namespace MySqlIntrospect.Core.Services;
+namespace McpIntrospect.MySql.Services;
 
-public interface IMySqlIntrospectionService
-{
-    Task<IEnumerable<SchemaInfo>> ListSchemasAsync();
-    Task<IEnumerable<TableInfo>> ListTablesAsync(string schemaName);
-    Task<TableInfoExtended?> DescribeTableAsync(string tableName, string schemaName);
-    Task<IEnumerable<TableReferenceInfo>> FindReferencesAsync(string tableName, string schemaName);
-    Task<IEnumerable<dynamic>> ExecuteQueryAsync(string sql);
-}
-
-public class MySqlIntrospectionService(IConfiguration configuration, ILogger<MySqlIntrospectionService> logger) : IMySqlIntrospectionService
+public class MySqlIntrospectionService(IConfiguration configuration, ILogger<MySqlIntrospectionService> logger) : IMcpIntrospectionService
 {
     private readonly ILogger<MySqlIntrospectionService> _logger = logger;
     private readonly IConfiguration _configuration = configuration;

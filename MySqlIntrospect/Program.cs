@@ -2,7 +2,7 @@ using System.CommandLine;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
-using MySqlIntrospect.Core.Services;
+using McpIntrospect.MySql.Services;
 
 var jsonOptions = new JsonSerializerOptions
 {

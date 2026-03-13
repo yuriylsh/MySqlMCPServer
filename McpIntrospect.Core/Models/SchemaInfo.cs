@@ -1,4 +1,4 @@
-namespace MySqlIntrospect.Core.Models;
+namespace McpIntrospect.Core.Models;
 
 public record SchemaInfo(
     string Name,

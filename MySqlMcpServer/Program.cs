@@ -2,7 +2,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
-using MySqlIntrospect.Core.Services;
+using McpIntrospect.Core.Services;
+using McpIntrospect.MySql.Services;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -16,7 +17,7 @@ builder.Logging.AddConsole(consoleLogOptions =>
     consoleLogOptions.LogToStandardErrorThreshold = LogLevel.Trace;
 });
 
-builder.Services.AddSingleton<IMySqlIntrospectionService, MySqlIntrospectionService>();
+builder.Services.AddSingleton<IMcpIntrospectionService, MySqlIntrospectionService>();
 
 builder.Services
     .AddMcpServer()

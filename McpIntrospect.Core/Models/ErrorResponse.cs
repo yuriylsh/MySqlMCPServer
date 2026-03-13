@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace MySqlIntrospect.Core.Models;
+namespace McpIntrospect.Core.Models;
 
 public record ErrorResponse(string error);
 

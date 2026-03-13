@@ -2,18 +2,18 @@ using System.ComponentModel;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;
-using MySqlIntrospect.Core.Models;
-using MySqlIntrospect.Core.Services;
+using McpIntrospect.Core.Models;
+using McpIntrospect.Core.Services;
 
 namespace MySqlMcpServer.Tools;
 
 [McpServerToolType]
 public class MySqlIntrospectionTools
 {
-    private readonly IMySqlIntrospectionService _introspectionService;
+    private readonly IMcpIntrospectionService _introspectionService;
     private readonly ILogger<MySqlIntrospectionTools> _logger;
 
-    public MySqlIntrospectionTools(IMySqlIntrospectionService introspectionService, ILogger<MySqlIntrospectionTools> logger)
+    public MySqlIntrospectionTools(IMcpIntrospectionService introspectionService, ILogger<MySqlIntrospectionTools> logger)
     {
         _introspectionService = introspectionService;
         _logger = logger;

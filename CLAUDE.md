@@ -62,17 +62,22 @@ This project uses Central Package Management. All package versions are defined i
 - Set reasonable query timeouts to prevent hanging
 - Validate against common MySQL hosting environments
 
-## Project Structure (To Be Created)
+## Project Structure
 ```
+McpIntrospect.Core/       # Shared interfaces and models (database-agnostic)
+├── Models/               # Data models (SchemaInfo, TableInfo, etc.)
+└── Services/             # IMcpIntrospectionService interface
+
+McpIntrospect.MySql/      # MySQL-specific implementation
+└── Services/             # MySqlIntrospectionService (Dapper + MySqlConnector)
+
 MySqlMcpServer/           # Main MCP server console application
 ├── Program.cs            # Entry point and MCP server setup
-├── Tools/                # MCP tool implementations
-├── Services/             # Database introspection services
-└── Models/               # Data models for schema information
+└── Tools/                # MCP tool implementations
 
 MySqlMcpClient/           # Sample client console application
-├── Program.cs            # Client demonstration workflows
-└── Examples/             # Common usage scenarios
+
+MySqlIntrospect/          # CLI tool for database introspection
 ```
 
 ## Sample Response Formats

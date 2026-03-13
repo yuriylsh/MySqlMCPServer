@@ -18,7 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MySqlIntrospect.Core\MySqlIntrospect.Core.csproj" />
+    <ProjectReference Include="..\McpIntrospect.Core\McpIntrospect.Core.csproj" />
+    <ProjectReference Include="..\McpIntrospect.MySql\McpIntrospect.MySql.csproj" />
   </ItemGroup>
 
   <ItemGroup>

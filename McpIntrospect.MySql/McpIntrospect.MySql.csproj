@@ -10,4 +10,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" />
     <PackageReference Include="Microsoft.Extensions.Logging" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\McpIntrospect.Core\McpIntrospect.Core.csproj" />
+  </ItemGroup>
 </Project>
