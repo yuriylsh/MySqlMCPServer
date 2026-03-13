@@ -18,6 +18,7 @@ var schemaOption = new Option<string>("--schema")
 
 var tableArgForDescribe = new Argument<string>("table") { Description = "Table name" };
 var tableArgForRefs = new Argument<string>("table") { Description = "Table name" };
+var sqlArgForQuery = new Argument<string>("sql") { Description = "SQL query to execute (read-only)" };
 
 var listSchemasCommand = new Command("list-schemas", "List all accessible database schemas");
 
@@ -33,6 +34,11 @@ var findReferencesCommand = new Command("find-references", "Find all tables that
 {
     tableArgForRefs,
     schemaOption
+};
+
+var queryCommand = new Command("query", "Execute a read-only SQL query against the database")
+{
+    sqlArgForQuery
 };
 
 listSchemasCommand.SetAction(async (parseResult, cancellationToken) =>
@@ -66,12 +72,20 @@ findReferencesCommand.SetAction(async (parseResult, cancellationToken) =>
     await RunCommand(async () => await service.FindReferencesAsync(table, schema));
 });
 
+queryCommand.SetAction(async (parseResult, cancellationToken) =>
+{
+    var sql = parseResult.GetValue(sqlArgForQuery)!;
+    var service = BuildService();
+    await RunCommand(async () => await service.ExecuteQueryAsync(sql));
+});
+
 var rootCommand = new RootCommand("MySQL database schema introspection CLI")
 {
     listSchemasCommand,
     listTablesCommand,
     describeTableCommand,
-    findReferencesCommand
+    findReferencesCommand,
+    queryCommand
 };
 
 return await rootCommand.Parse(args).InvokeAsync();

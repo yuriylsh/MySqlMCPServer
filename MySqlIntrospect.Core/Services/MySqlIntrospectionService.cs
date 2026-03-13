@@ -12,6 +12,7 @@ public interface IMySqlIntrospectionService
     Task<IEnumerable<TableInfo>> ListTablesAsync(string schemaName);
     Task<TableInfoExtended?> DescribeTableAsync(string tableName, string schemaName);
     Task<IEnumerable<TableReferenceInfo>> FindReferencesAsync(string tableName, string schemaName);
+    Task<IEnumerable<dynamic>> ExecuteQueryAsync(string sql);
 }
 
 public class MySqlIntrospectionService(IConfiguration configuration, ILogger<MySqlIntrospectionService> logger) : IMySqlIntrospectionService
@@ -160,5 +161,17 @@ public class MySqlIntrospectionService(IConfiguration configuration, ILogger<MyS
             ORDER BY kcu.TABLE_NAME, kcu.CONSTRAINT_NAME, kcu.ORDINAL_POSITION
             """, new { schemaName, tableName });
         return references.AsList();
+    }
+
+    public async Task<IEnumerable<dynamic>> ExecuteQueryAsync(string sql)
+    {
+        if (string.IsNullOrWhiteSpace(sql))
+            throw new ArgumentException("SQL query cannot be empty.", nameof(sql));
+        if (sql.Contains("SET SESSION", StringComparison.OrdinalIgnoreCase))
+            throw new ArgumentException("SET SESSION statements are not allowed.", nameof(sql));
+
+        await using var connection = await GetConnectionAsync();
+        var results = await connection.QueryAsync<dynamic>(sql);
+        return results.AsList();
     }
 }

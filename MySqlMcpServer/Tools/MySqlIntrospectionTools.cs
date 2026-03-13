@@ -77,4 +77,26 @@ public class MySqlIntrospectionTools
             return JsonSerializer.Serialize(new ErrorResponse($"Error describing table '{table_name}' in schema '{schema_name}': {ex.Message}"), ErrorResponseSerializerContext.Default.ErrorResponse);
         }
     }
+
+    [McpServerTool(Name = "execute_query"),
+     Description("Executes a read-only SQL query against the MySQL database. Only SELECT queries are allowed — no data or schema modification. Use LIMIT whenever possible to avoid returning excessive rows. This tool applies only to MySql database.")]
+    public async Task<object> ExecuteQuery(
+        [Description("The SQL query to execute. Must be a read-only SELECT query. Include a LIMIT clause whenever possible.")] string? sql)
+    {
+        if (string.IsNullOrEmpty(sql)) return JsonSerializer.Serialize(new ErrorResponse("`sql` is required."), ErrorResponseSerializerContext.Default.ErrorResponse);
+        try
+        {
+            var results = await _introspectionService.ExecuteQueryAsync(sql);
+            return new { results };
+        }
+        catch (ArgumentException ex)
+        {
+            return JsonSerializer.Serialize(new ErrorResponse(ex.Message), ErrorResponseSerializerContext.Default.ErrorResponse);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error executing query");
+            return JsonSerializer.Serialize(new ErrorResponse($"Error executing query: {ex.Message}"), ErrorResponseSerializerContext.Default.ErrorResponse);
+        }
+    }
 }
